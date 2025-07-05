@@ -8,7 +8,8 @@ export const noteConverter = {
     toFirestore: (note: Note) => {
         return {
             text: note.text,
-            position: note.position
+            position: note.position,
+            color: note.color
         };
     },
     fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
@@ -16,14 +17,14 @@ export const noteConverter = {
 
         const note: Note = new Note(snapshot.id, data.text);
 
+        if ('color' in data && typeof data.color === 'string') note.addColor(data.color);
+
         if (
             data.position &&
             typeof data.position.top === 'number' &&
             typeof data.position.left === 'number'
         ) {
             note.addPosition({ top: data.position.top, left: data.position.left });
-        } else {
-            note.addPosition({ top: 50, left: 50 });
         }
 
         return note;
