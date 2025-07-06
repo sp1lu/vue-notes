@@ -3,7 +3,7 @@
 */
 <script setup lang="ts">
 /** Libraries */
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 /** Props */
 const props = withDefaults(defineProps<{
@@ -17,6 +17,11 @@ const props = withDefaults(defineProps<{
     left: 50
 });
 
+/** Emits */
+const emits = defineEmits<{
+    'note-position-change': [{ top: number, left: number }];
+}>();
+
 /** Refs */
 const top = ref<number>(props.top);
 const left = ref<number>(props.left);
@@ -29,6 +34,8 @@ const onMouseDown = (): void => {
 
 const onMouseUp = (): void => {
     isMoving.value = false;
+    if (top.value !== props.top || left.value !== props.left) emits('note-position-change', { top: top.value, left: left.value });
+
 }
 
 const onMouseMove = (event: MouseEvent): void => {

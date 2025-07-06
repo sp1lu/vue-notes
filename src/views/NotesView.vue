@@ -43,7 +43,7 @@ const onPageLClick = (): void => {
     if (isCreatingNote.value && Object.values(newNoteData).every((v): v is string => v !== null && v !== '')) {
         addNote(new Note(new Date().getTime() + '', newNoteData.text!, user.value ? user.value.uid : '', newNoteData.color!, contextMenuPosition.value));
 
-        newNoteData.text= null;
+        newNoteData.text = null;
         newNoteData.color = null;
     }
 
@@ -67,6 +67,10 @@ const onNewNoteChange = (data: { text: string, color: string }): void => {
     newNoteData.text = data.text;
     newNoteData.color = data.color;
 }
+
+const onNoteMove = (position: Position, id: string): void => {
+    console.log(id, position);
+}
 </script>
 
 /**
@@ -75,7 +79,8 @@ const onNewNoteChange = (data: { text: string, color: string }): void => {
 <template>
     <div class="notes-view" @click.left="onPageLClick" @click.right.prevent="onPageRClick">
         <sticky-note v-for="note in allNotes" :text="note.text" :color="note.color"
-            :top="note.position ? note.position.top : 50" :left="note.position ? note.position.left : 50" />
+            :top="note.position ? note.position.top : 50" :left="note.position ? note.position.left : 50"
+            @note-position-change="onNoteMove($event, note.id)" />
 
         <tools-bar>
             <template v-slot:content>
