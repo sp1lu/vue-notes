@@ -3,7 +3,7 @@
 */
 <script setup lang="ts">
 /** Libraries */
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 /** Props */
 const { top, left } = defineProps<{
@@ -11,16 +11,29 @@ const { top, left } = defineProps<{
     left: number
 }>();
 
+/** Emits */
+const emits = defineEmits<{
+    'data-change': [{ text: string, color: string }]
+}>();
+
 /** Refs */
 const text = ref<string>('');
 const color = ref<string>('yellow');
+
+/** Watchers */
+watch([text, color], ([newText, newColor]) => {
+    emits('data-change', {
+        text: newText,
+        color: newColor
+    });
+});
 </script>
 
 /**
 * Template
 */
 <template>
-    <div class="new-sticky-note" :style="{ top: `${top}px`, left: `${left}px` }">
+    <div class="new-sticky-note" :style="{ top: `${top}%`, left: `${left}%` }">
         <div class="note" :style="{ backgroundColor: color }">
             <textarea class="textarea" v-model="text"></textarea>
         </div>

@@ -3,10 +3,10 @@
 */
 <script setup lang="ts">
 /** Libraries */
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 /** Composables */
-import { useNotes } from '../composables';
+import { useAuth, useNotes } from '../composables';
 
 /** Models */
 import { Note, type Position } from '../models';
@@ -19,6 +19,7 @@ import IconButton from '../components/IconButton.vue';
 import NewStickyNote from '../components/NewStickyNote.vue';
 
 /** Composables */
+const { user } = useAuth();
 const { allNotes, subscribeToAllNotes, addNote } = useNotes();
 
 /** Refs */
@@ -26,6 +27,7 @@ const showContextMenu = ref<boolean>(false);
 const contextMenuPosition = ref<Position>({ top: 50, left: 50 });
 
 const isCreatingNote = ref<boolean>(false);
+const newNoteData = reactive<{ text: string | null, color: string | null }>({ text: null, color: null });
 
 /** Component lifecycle */
 onMounted(async () => {
@@ -38,7 +40,12 @@ watch(allNotes, (newNotes) => {
 
 /** Methods */
 const onPageLClick = (): void => {
-    if (isCreatingNote.value) addNote(new Note(new Date().getTime() + '', 'TESTING', 'red', contextMenuPosition.value));
+    if (isCreatingNote.value && Object.values(newNoteData).every((v): v is string => v !== null && v !== '')) {
+        addNote(new Note(new Date().getTime() + '', newNoteData.text!, user.value ? user.value.uid : '', newNoteData.color!, contextMenuPosition.value));
+
+        newNoteData.text= null;
+        newNoteData.color = null;
+    }
 
     showContextMenu.value = false;
     isCreatingNote.value = false;
@@ -46,7 +53,7 @@ const onPageLClick = (): void => {
 }
 
 const onPageRClick = (event: MouseEvent): void => {
-    contextMenuPosition.value = { top: event.clientY, left: event.clientX };
+    contextMenuPosition.value = { top: (event.clientY / window.innerHeight) * 100, left: (event.clientX / window.innerWidth) * 100 };
     isCreatingNote.value = false;
     showContextMenu.value = true;
 }
@@ -55,11 +62,15 @@ const onNewNoteBtnClick = (): void => {
     showContextMenu.value = false;
     isCreatingNote.value = true;
 }
+
+const onNewNoteChange = (data: { text: string, color: string }): void => {
+    newNoteData.text = data.text;
+    newNoteData.color = data.color;
+}
 </script>
 
 /**
 * Template
-@click.right.prevent="onPageClick"
 */
 <template>
     <div class="notes-view" @click.left="onPageLClick" @click.right.prevent="onPageRClick">
@@ -80,7 +91,7 @@ const onNewNoteBtnClick = (): void => {
         </context-menu>
 
         <new-sticky-note v-if="isCreatingNote" :top="contextMenuPosition.top" :left="contextMenuPosition.left"
-            @click.stop />
+            @click.stop @data-change="onNewNoteChange" />
     </div>
 </template>
 

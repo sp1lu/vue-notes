@@ -12,7 +12,7 @@ const { top, left } = defineProps<{
 * Template
 */
 <template>
-    <div class="context-menu" :style="{ top: `${top}px`, left: `${left}px` }">
+    <div class="context-menu" :style="{ top: `${top}%`, left: `${left}%` }">
         <slot name="content"></slot>
     </div>
 </template>
