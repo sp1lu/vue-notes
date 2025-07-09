@@ -3,7 +3,7 @@
 */
 <script setup lang="ts">
 /** Libraries */
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, toRaw, watch } from 'vue';
 
 /** Composables */
 import { useAuth, useNotes } from '../composables';
@@ -20,7 +20,7 @@ import NewStickyNote from '../components/NewStickyNote.vue';
 
 /** Composables */
 const { user } = useAuth();
-const { allNotes, subscribeToAllNotes, addNote } = useNotes();
+const { allNotes, subscribeToAllNotes, addNote, updateNotePosition } = useNotes();
 
 /** Refs */
 const showContextMenu = ref<boolean>(false);
@@ -69,7 +69,7 @@ const onNewNoteChange = (data: { text: string, color: string }): void => {
 }
 
 const onNoteMove = (position: Position, id: string): void => {
-    console.log(id, position);
+    updateNotePosition(id, position!);
 }
 </script>
 

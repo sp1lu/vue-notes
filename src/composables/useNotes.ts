@@ -1,13 +1,13 @@
 /** Libraries */
-import { addDoc, collection, doc, getDocs, onSnapshot, query, QueryDocumentSnapshot, QuerySnapshot, setDoc, where, type Unsubscribe } from 'firebase/firestore';
+import { addDoc, collection, doc, DocumentReference, getDocs, onSnapshot, query, QueryDocumentSnapshot, QuerySnapshot, setDoc, updateDoc, where, type Unsubscribe } from 'firebase/firestore';
 import { useFirebase } from './useFirebase';
 
 /** Models */
-import type { Note } from '../models';
+import type { Note, Position } from '../models';
 
 /** Converters */
 import { noteConverter } from '../firebaseConverters';
-import { ref } from 'vue';
+import { ref, type Ref } from 'vue';
 
 /** Composable */
 export function useNotes() {
@@ -19,9 +19,9 @@ export function useNotes() {
     const getAllNotes = async (): Promise<Note[]> => {
         const notes: Note[] = [];
 
-        const querySnapshot: QuerySnapshot = await getDocs(collection(db, 'notes').withConverter(noteConverter));
-        querySnapshot.forEach((doc: QueryDocumentSnapshot) => {
-            notes.push(doc.data() as Note);
+        const querySnapshot: QuerySnapshot<Note> = await getDocs(collection(db, 'notes').withConverter(noteConverter));
+        querySnapshot.forEach((doc: QueryDocumentSnapshot<Note>) => {
+            notes.push(doc.data());
         });
 
         return notes;
@@ -29,11 +29,11 @@ export function useNotes() {
 
     const subscribeToAllNotes = () => {
         const q = query(collection(db, 'notes').withConverter(noteConverter));
-        notesUnsubscribe.value = onSnapshot(q, (querySnapshot: QuerySnapshot) => {
+        notesUnsubscribe.value = onSnapshot(q, (querySnapshot: QuerySnapshot<Note>) => {
             const result: Note[] = [];
 
-            querySnapshot.forEach((doc: QueryDocumentSnapshot) => {
-                result.push(doc.data() as Note);
+            querySnapshot.forEach((doc: QueryDocumentSnapshot<Note>) => {
+                result.push(doc.data());
             });
 
             allNotes.value = [...result];
@@ -41,7 +41,17 @@ export function useNotes() {
     }
 
     const addNote = async (note: Note) => {
-        const docRef = await addDoc(collection(db, 'notes').withConverter(noteConverter), note);
+        await addDoc(collection(db, 'notes').withConverter(noteConverter), note);
+    }
+
+    const updateNotePosition = async (id: string, position: Position) => {
+        const docRef: DocumentReference = doc(db, 'notes', id);
+        await updateDoc(docRef, {
+            position: {
+                left: position.left,
+                top: position.top
+            }
+        });
     }
 
     const unsubscribeFromAllNotes = () => {
@@ -51,5 +61,5 @@ export function useNotes() {
         }
     }
 
-    return { allNotes, getAllNotes, subscribeToAllNotes, unsubscribeFromAllNotes, addNote }
+    return { allNotes, getAllNotes, subscribeToAllNotes, unsubscribeFromAllNotes, addNote, updateNotePosition }
 }

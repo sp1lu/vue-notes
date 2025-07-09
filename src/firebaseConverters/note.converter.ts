@@ -13,7 +13,7 @@ export const noteConverter = {
             color: note.color
         };
     },
-    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions): Note => {
         const data: DocumentData = snapshot.data(options);
 
         const note: Note = new Note(snapshot.id, data.text, data.user);

@@ -1,7 +1,7 @@
 import type { Position } from './position.interface';
 
 export class Note {
-    private _id: string;
+    public _id: string;
     public text: string;
     public user: string;
     public color?: string;
