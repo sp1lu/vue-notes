@@ -3,7 +3,7 @@
 */
 <script setup lang="ts">
 /** Libraries */
-import { ref, watch } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 
 /** Props */
 const props = withDefaults(defineProps<{
@@ -23,25 +23,40 @@ const emits = defineEmits<{
 }>();
 
 /** Refs */
+const noteRef = useTemplateRef('noteRef');
 const top = ref<number>(props.top);
 const left = ref<number>(props.left);
 const isMoving = ref<boolean>(false);
+const offsetY = ref<number>(0);
+const offsetX = ref<number>(0);
+
+/** Computeds */
+const getZIndex = computed<number>(() => {
+    return isMoving.value ? 999 : 0;
+});
 
 /** Methods */
-const onMouseDown = (): void => {
+const onMouseDown = (event: MouseEvent): void => {    
+    const clientRect: DOMRect | undefined = noteRef.value?.getBoundingClientRect();
+    if (!clientRect) return;
+    
+    offsetY.value = event.clientY - clientRect.top;
+    offsetX.value = event.clientX - clientRect.left;
+
     isMoving.value = true;
 }
 
 const onMouseUp = (): void => {
     isMoving.value = false;
     if (top.value !== props.top || left.value !== props.left) emits('note-position-change', { top: top.value, left: left.value });
-
 }
 
 const onMouseMove = (event: MouseEvent): void => {
     if (!isMoving.value) return;
-    top.value = (event.clientY / window.innerHeight) * 100;
-    left.value = (event.clientX / window.innerWidth) * 100;
+    const clientRect: DOMRect | undefined = noteRef.value?.getBoundingClientRect();
+    if (!clientRect) return;
+    top.value = ((event.clientY - offsetY.value) / window.innerHeight) * 100;
+    left.value = ((event.clientX - offsetX.value) / window.innerWidth) * 100;
 }
 </script>
 
@@ -49,8 +64,8 @@ const onMouseMove = (event: MouseEvent): void => {
 * Template
 */
 <template>
-    <div class="sticky-note" :style="{ backgroundColor: props.color, top: `${top}%`, left: `${left}%` }"
-        @mousedown="onMouseDown" @mouseup="onMouseUp" @mousemove="onMouseMove">
+    <div class="sticky-note" :style="{ backgroundColor: props.color, top: `${top}%`, left: `${left}%`, zIndex: `${getZIndex}` }"
+        @mousedown="onMouseDown" @mouseup="onMouseUp" @mousemove="onMouseMove" ref="noteRef">
         <p>{{ text }}</p>
     </div>
 </template>
@@ -61,7 +76,7 @@ const onMouseMove = (event: MouseEvent): void => {
 <style scoped>
 .sticky-note {
     position: fixed;
-    transform: translate(-50%, -50%);
+    /* transform: translate(-50%, -50%); */
     height: 200px;
     width: 200px;
     display: flex;
