@@ -3,7 +3,9 @@
 */
 <script setup lang="ts">
 /** Libraries */
-import { onMounted, reactive, ref, toRaw, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import type { User } from 'firebase/auth';
 
 /** Composables */
 import { useAuth, useNotes } from '../composables';
@@ -19,8 +21,9 @@ import IconButton from '../components/IconButton.vue';
 import NewStickyNote from '../components/NewStickyNote.vue';
 
 /** Composables */
-const { user } = useAuth();
+const { user, logOut } = useAuth();
 const { allNotes, subscribeToAllNotes, addNote, updateNotePosition } = useNotes();
+const { push } = useRouter();
 
 /** Refs */
 const showContextMenu = ref<boolean>(false);
@@ -32,6 +35,10 @@ const newNoteData = reactive<{ text: string | null, color: string | null }>({ te
 /** Component lifecycle */
 onMounted(async () => {
     subscribeToAllNotes();
+});
+
+watch(user, (newUser: User | null) => {
+    if (!newUser) push('/home');
 });
 
 watch(allNotes, (newNotes) => {
@@ -77,6 +84,7 @@ const onNoteMove = (position: Position, id: string): void => {
 * Template
 */
 <template>
+    <button type="button" @click="logOut">LOGOUT</button>
     <div class="notes-view" @click.left="onPageLClick" @click.right.prevent="onPageRClick">
         <sticky-note v-for="note in allNotes" :text="note.text" :color="note.color"
             :top="note.position ? note.position.top : 50" :left="note.position ? note.position.left : 50"

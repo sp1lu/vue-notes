@@ -1,5 +1,10 @@
+/** Libraries */
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router';
 
+/** Guards */
+import { userGuard } from './guards';
+
+/** Router */
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
@@ -13,7 +18,8 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/notes',
         name: 'notes',
-        component: () => import('./views/NotesView.vue')
+        component: () => import('./views/NotesView.vue'),
+        beforeEnter: userGuard
     },
     {
         path: '/privacy-policy',

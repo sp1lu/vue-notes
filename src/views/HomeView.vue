@@ -3,7 +3,8 @@
 */
 <script setup lang="ts">
 /** Libraries */
-import { onMounted, ref, watch } from 'vue';
+import { watch } from 'vue';
+import { useRouter } from 'vue-router';
 import type { User } from 'firebase/auth';
 
 /** Composables */
@@ -11,13 +12,14 @@ import { useAuth } from '../composables';
 
 /** Composables */
 const { user, signInWithGoogle } = useAuth();
+const { push } = useRouter();
 
 /** Refs */
 
 /** Watchers */
-// watch(user, (newUser: User | null) => {
-//     console.log(newUser);
-// });
+watch(user, (newUser: User | null) => {
+    if (newUser) push('/notes');
+});
 </script>
 
 /**
@@ -36,11 +38,7 @@ const { user, signInWithGoogle } = useAuth();
                 </span>
                 <span class="login-btn__text">Sign in with Google</span>
             </button>
-
-            <span class="privacy-policy">
-                By signing up you accept our <router-link to="/privacy-policy">privacy policy</router-link>.
-            </span>
-            <!-- <p>{{ user ? user.email : 'Non loggato' }}</p> -->
+            <span class="privacy-policy">By signing up you accept our <router-link to="/privacy-policy">privacy policy</router-link>.</span>
         </form>
     </div>
 </template>
