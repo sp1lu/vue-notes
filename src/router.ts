@@ -16,9 +16,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./views/NotesView.vue')
     },
     {
-        path: '/about',
-        name: 'about',
-        component: () => import('./views/AboutView.vue')
+        path: '/privacy-policy',
+        name: 'privacy-policy',
+        component: () => import('./views/PrivacyPolicyView.vue')
     }
 ];
 

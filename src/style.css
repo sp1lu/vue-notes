@@ -78,7 +78,41 @@ button:focus-visible {
   }
 } */
 
+/** Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+/** Root */
+:root {
+  --font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  --accent-900: #000003;
+  --accent-800: #101C59;
+  --accent-700: #18297F;
+  --accent-600: #1F33A6;
+  --accent-500: #263FCC;
+  --accent-400: #2E4DE6;
+  --accent-300: #AABFFF;
+  --accent-200: #D6E0FF;
+  --accent-100: #FCFFFF;
+
+  --neutral-900: #000;
+  --neutral-800: #222;
+  --neutral-700: #444;
+  --neutral-600: #666;
+  --neutral-500: #888;
+  --neutral-400: #aaa;
+  --neutral-300: #ccc;
+  --neutral-200: #eee;
+  --neutral-100: #fff;
+
+  --border-radius-s: 4px;
+  --border-radius-m: 8px;
+  --border-radius-l: 16px;
+}
+
+/** General */
 * {
+  font-family: var(--font-family);
   box-sizing: border-box;
 }
 
@@ -88,10 +122,34 @@ body {
   padding: 0;
 }
 
+/** Elements */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
 p {
   margin: 0;
 }
 
 ul {
   margin: 0;
+}
+
+a {
+  color: var(--accent-400);
+  
+  &:hover {
+    color: var(--accent-800);    
+  }
+}
+
+button {
+  cursor: pointer;
+  /* background-color: transparent; */
+  border: none;
 }
